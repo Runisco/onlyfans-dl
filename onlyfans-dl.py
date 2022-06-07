@@ -49,15 +49,28 @@ def assure_dir(path):
 def create_auth():
     with open("auth.json") as f:
         ljson = json.load(f)
-    return {
-        "Accept": "application/json, text/plain, */*",
-        "User-Agent": ljson["user-agent"],
-        "Accept-Encoding": "gzip, deflate",
-        "user-id": ljson["user-id"],
-        "x-bc": ljson["x-bc"],
-        "Cookie": "sess=" + ljson["sess"],
-        "app-token": APP_TOKEN
-    }
+    info = ljson.get("auth", False)
+
+    if info:
+        return {
+            "Accept": "application/json, text/plain, */*",
+            "User-Agent": ljson["auth"]["user_agent"],
+            "Accept-Encoding": "gzip, deflate",
+            "user-id": ljson["auth"]["username"].replace("u",""),
+            "x-bc": ljson["auth"]["x_bc"],
+            "Cookie": ljson['auth']['cookie'].split(";")[1].strip(),
+            "app-token": APP_TOKEN
+        }
+    else:
+        return {
+            "Accept": "application/json, text/plain, */*",
+            "User-Agent": ljson["user-agent"],
+            "Accept-Encoding": "gzip, deflate",
+            "user-id": ljson["user-id"],
+            "x-bc": ljson["x-bc"],
+            "Cookie": "sess=" + ljson["sess"],
+            "app-token": APP_TOKEN
+        }
 
 
 # Every API request must be signed
